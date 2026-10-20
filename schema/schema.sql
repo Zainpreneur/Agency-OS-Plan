@@ -989,3 +989,20 @@ CREATE TABLE outbox (
 -- Investor I2..I8 · Team T2..T7.
 -- v1 send = copy-to-clipboard + mailto (subject pre-filled); WhatsApp
 -- and send APIs deferred — channel column is ready when they arrive.
+
+-- ════════════════════════════════════════════════════════════════════
+-- V8 (doc 23) — UI/UX: owner cockpit settings
+-- Everything else the UI needs already exists as columns; UI state
+-- that must survive a device change lives here (key/value).
+-- ════════════════════════════════════════════════════════════════════
+
+CREATE TABLE app_settings (
+  key        TEXT PRIMARY KEY,   -- owner_name|owner_email|signature|invoice_due_days|
+                                 -- followup_cadences_json|timezone|theme|gate_enabled
+  value      TEXT NOT NULL,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+-- UI principles (doc 23): queue-driven Today screen (drain to zero),
+-- cascade previews on money actions, guard badges ("waiting on INV-42"),
+-- snapshot badges, StatusChip maps every enum to plain language,
+-- mobile-first for Today/Comms/Money/Clients/Scan, no portals/roles.

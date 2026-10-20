@@ -383,6 +383,33 @@ arrive.
 
 ---
 
+## 24. UI/UX — the owner cockpit (doc 23)
+
+Queue-driven, not dashboard-y: the home screen is **Today** — a worklist
+drained to zero (needs-reply → send-today → money → blockers → this
+week), each row with one primary action. Signature patterns: **cascade
+preview** ("marking INV-42 paid makes payable: Payout #9 · Investor
+payout #3", confirm once, Undo available), **guard badges** ("blocked —
+waiting on INV-42", clickable), **snapshot badges** ("priced 12 Mar —
+immutable"), the **Send modal** (rendered email → edit → copy + mailto
+→ mark sent → follow-up auto-scheduled), and the **Paste-reply modal**
+(paste → pre-selected status flip → queue cancels). IA: nine sections
+(Today, Sales, Projects, Money, People, Catalogue, Infra, Comms,
+Settings) mapped doc-by-doc; proposal builder renders doc 17's engine
+as attribute pills with a live breakdown and hidden margin; payouts
+board makes the blocked→payable guard literal; investor 360 shows
+capital/position/rounds incl. salvage lineage. Visual system: one
+`StatusChip` component maps every schema enum to plain language +
+semantic color (gray = blocked-by-guard), tabular numerals for money.
+Mobile-first for five screens (Today, Comms, Money, Clients, Scan-receipt).
+Deliberately not built: portals, roles, notification systems, actionless
+charts. Build order: Phase A (Today, leads, proposal builder, invoices
++ cascade, Comms) → Phase B (payouts, procurement, deployments,
+investors, vault) → Phase C (reports, waterfall, default/salvage
+screens, ⌘K, RTL). Schema v8: one `app_settings` key/value table.
+
+---
+
 ## Delivery order (MVP → v2)
 
 | Phase | Scope |

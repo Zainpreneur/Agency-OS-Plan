@@ -359,6 +359,30 @@ schema v6: two columns on `project_funding` and one
 
 ---
 
+## 23. Email-first communications — WhatsApp deferred (doc 22)
+
+v1 talks to everyone by email: plain-text conversational templates,
+merge fields, copy-to-clipboard + `mailto:` (subject pre-filled), every
+send logged in `comms_log`, replies pasted verbatim and flipped into
+status changes. **~45 templates across six stakeholders**, each with
+stage, trigger, expected-reply → status-flip, and sequence chaining:
+leads (L1–L10: cold outreach → follow-ups → demo → proposal → won/lost),
+clients & delivery (C1–C12: welcome → intake questionnaire → milestones
+→ review → live → acceptance → handover), invoicing (P1–P7: invoice →
+3-tier reminders → thanks → renewal notices), vendors (V1–V8: RFQ → PO
+→ chase → receipt → remittance → dispute → RMA), investors (I1–I11:
+intro → round offer → commitment → funds → monthly → payout → default
+→ recovery → salvage offer), team (T1–T9: expectations → brief → ack →
+check-ins → accrued → paid → bonus → digest). Sequences are **chains of
+template rows** (`followup_template_code` + days), not an automation
+engine; the `outbox` table makes the daily queue real, and any inbound
+reply cancels that contactable's pending nudges. Tone rules: one ask
+per email, no jargon, numbers always match snapshot rows. WhatsApp and
+send APIs stay deferred — the `channel` column is ready when they
+arrive.
+
+---
+
 ## Delivery order (MVP → v2)
 
 | Phase | Scope |

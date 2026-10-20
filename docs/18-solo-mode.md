@@ -43,9 +43,9 @@ as pure read-views — **no data migration, no new money logic, no fork**.
    (`{client}` `{amount}` `{link}` `{due}`)
 2. **Render** — app fills fields from the exact row (invoice snapshot
    price, proposal breakdown, deployment status)
-3. **Deliver** — one click: copy to clipboard + open
-   `wa.me/<number>?text=…` or `mailto:…`; optional direct send via
-   WhatsApp Cloud API (agency's own Meta account, doc 15)
+3. **Deliver** — one click: copy rendered body to clipboard + open
+   `mailto:` (subject pre-filled; **v1 = email only** — WhatsApp and any
+   send API are deferred, see doc 22)
 4. **Record** — `comms_log` row (out, template code, snippet, at) — the
    OS remembers what was said, so the owner answers from context
 5. **Inbound** — owner pastes the reply (or voice-note summary) into the
@@ -54,7 +54,8 @@ as pure read-views — **no data migration, no new money logic, no fork**.
 **Daily queue**: the dashboard computes *today's sends* — follow-ups due,
 invoices ready, unpaid > 7 days, payout digests — as one worklist with a
 Send button each. The owner works through it like inbox-zero; no
-automation, no forgotten lead.
+automation, no forgotten lead. (v2: made real by the `outbox` table and
+sequence chains — doc 22.)
 
 ## Flow deltas (money logic unchanged)
 

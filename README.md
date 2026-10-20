@@ -69,6 +69,7 @@ CLIENTS ──► SALES ──► INVOICING & PAYMENTS ──► SUBSCRIPTIONS (
 | 19 | [POS Scenario Walkthrough](docs/19-pos-scenario-walkthrough.md) | Worked example: WhatsApp deal → POs → investor advance → tiers → margin |
 | 20 | [Loss & Default Waterfall](docs/20-loss-default-waterfall.md) | Client vanishes: freeze → liquidate → pro-rata recovery → realized loss → prevention gates |
 | 21 | [Salvage Play](docs/21-salvage-play.md) | Dead deal → next deal: repurposed assets, salvage round, enhanced tiers, template birth |
+| 22 | [Email-First Communications](docs/22-email-first-communications.md) | ~45 templates × 6 stakeholders, stages, reply-flips, sequence chains (WhatsApp deferred) |
 
 The consolidated narrative is in **[PROJECT_PLAN.md](PROJECT_PLAN.md)** and the
 full DDL in **[schema/schema.sql](schema/schema.sql)**.

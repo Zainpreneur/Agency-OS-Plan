@@ -952,3 +952,40 @@ CREATE TABLE recovery_distributions (          -- who gets salvaged cash, in ord
 -- Net example: 60k waterfall -> recovery 9k, team 12k, investors 30k,
 -- agency margin 9k + template IP + 49 warmed leads.
 -- ════════════════════════════════════════════════════════════════════
+
+-- ════════════════════════════════════════════════════════════════════
+-- V7 (doc 22) — EMAIL-FIRST COMMUNICATIONS (WhatsApp deferred)
+-- ~45 plain-text templates across 6 stakeholders, each with stage,
+-- trigger, expected reply -> status flip, and sequence chaining.
+-- ════════════════════════════════════════════════════════════════════
+
+ALTER TABLE message_templates ADD COLUMN stakeholder TEXT;  -- lead|client|investor|team|vendor|any
+ALTER TABLE message_templates ADD COLUMN stage TEXT;        -- pipeline stage it belongs to
+ALTER TABLE message_templates ADD COLUMN trigger_note TEXT; -- when the owner sends this
+ALTER TABLE message_templates ADD COLUMN expected_reply TEXT; -- what a reply means (status flip)
+ALTER TABLE message_templates ADD COLUMN followup_template_code TEXT REFERENCES message_templates(code);
+ALTER TABLE message_templates ADD COLUMN followup_after_days INTEGER;
+
+-- The daily worklist, made real. Sending a template auto-schedules its
+-- followup row; any inbound reply cancels pending rows (cancelled_by).
+CREATE TABLE outbox (
+  id                INTEGER PRIMARY KEY,
+  contactable_type  TEXT NOT NULL,    -- lead|client|investor|team|vendor
+  contactable_id    INTEGER NOT NULL,
+  template_code     TEXT NOT NULL REFERENCES message_templates(code),
+  subject           TEXT,             -- rendered, owner-editable
+  body              TEXT,             -- merge fields resolved, owner-editable
+  due_at            TEXT NOT NULL,
+  status            TEXT NOT NULL DEFAULT 'scheduled', -- scheduled|ready|sent|skipped
+  sent_at           TEXT,
+  comms_log_id      INTEGER REFERENCES comms_log(id),
+  cancelled_by      TEXT              -- inbound_reply|status_change|manual
+);
+-- Template catalogue (doc 22): L1-L10 leads, C1-C12 clients/delivery,
+-- P1-P7 invoicing, V1-V8 vendors, I1-I11 investors, T1-T9 team.
+-- Sequences are CHAINS OF ROWS (followup_template_code + days), not an
+-- automation engine: ColdLead L1>L2>L3>L4 · Proposal L7>L8>L9 ·
+-- Delivery C1..C11 · Invoice P1>P2>P3>P4 · Vendor V2..V6 ·
+-- Investor I2..I8 · Team T2..T7.
+-- v1 send = copy-to-clipboard + mailto (subject pre-filled); WhatsApp
+-- and send APIs deferred — channel column is ready when they arrive.

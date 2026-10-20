@@ -176,7 +176,47 @@ know which of the 15 branches they belong to.
 
 ---
 
-## Delivery order (MVP → v1.5)
+## 12. Code & Client Repos (doc 11)
+
+Client code lives in **one private repo per client** (`client-alnoor-website`),
+created at conversion. Protected `main`, staging `develop`, deploy = tag
+(`v1.4` = what's live, a git fact). Updates flow: ticket → (change request →
+mini-proposal) → branch → PR → merge = deploy → client pinged. Maintenance
+clients get **ready-to-merge update PRs** when the upstream template improves
+— churn defense with zero extra labor.
+
+## 13. Custom Projects & Procurement (doc 12)
+
+`full_build` projects enforce a **budget breakdown** at creation (hardware
+15k / team 10k / other 5k against a 50k contract). Hardware goes through
+`purchase_orders` → `client_devices` (serials, firmware, RMA — distinct from
+our own asset register). Live margin: contract vs spent vs committed vs
+accrued payouts, visible daily.
+
+## 14. Investors & Funding (doc 13)
+
+Big builds can be funded by investors: `project_funding` round →
+`investments` with **snapshotted promised returns** → funds tracked as
+project-restricted cash, never mixed with ops. On the closing client
+payment, the `funding_waterfalls` distribute (3 × 15k = 45k to investors,
+5k residual to agency) via `investor_payouts` with the same
+**blocked-until-client-pays** guard the team uses. Investor portal + auto
+statements.
+
+## 15. Module Add-ons — AI-assisted builds (doc 14)
+
+Existing client asks for more capability ("POS + HR module?") → ticket →
+mini-proposal (3k, snapshot) → `module_order` with a **flat team fee** (500,
+not hourly/monthly) → platform renders a **build spec** (scope + client
+stack + brand tokens) → team member opens the repo in OpenCode/Claude Code,
+builds, PRs, merges → deploy = tag → invoice → payout accrues on payment,
+blocked until paid. The AI tool varies; the spec doesn't. Dogfood note:
+this is the same loop that builds Agency OS itself — *build for yourself
+before you build for others*.
+
+---
+
+## Delivery order (MVP → v2)
 
 | Phase | Scope |
 |---|---|
@@ -185,3 +225,4 @@ know which of the 15 branches they belong to.
 | Week 3 | Proposals (snapshot pricing); convert-to-client transaction |
 | Week 4 | Payouts ledger; assets register; monthly cost-allocation job |
 | v2 | Upsell rules engine; multi-branch product schema; client portal |
+| v2.5 | Client repos & update PRs; investors & funding; module add-on engine |

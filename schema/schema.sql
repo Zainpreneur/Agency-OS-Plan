@@ -603,3 +603,131 @@ CREATE TABLE cw_inventory_moves (
   ref_id      INTEGER,
   created_at  TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+-- ══ V2 (docs 11–14): code lifecycle, procurement, funding, add-ons ═════════
+
+-- ── CLIENT REPOS (where client code lives) ─────────────────────────────────
+CREATE TABLE client_repos (
+  id                  INTEGER PRIMARY KEY,
+  client_id           INTEGER NOT NULL REFERENCES clients(id),
+  project_id          INTEGER REFERENCES projects(id),
+  repo_name           TEXT NOT NULL UNIQUE,      -- client-alnoor-website
+  kind                TEXT NOT NULL DEFAULT 'website', -- website|custom_software
+  default_branch      TEXT NOT NULL DEFAULT 'main',
+  staging_branch      TEXT NOT NULL DEFAULT 'develop',
+  hosting             TEXT, deploy_hook TEXT,
+  live_tag            TEXT,                      -- v1.4 currently in production
+  github_app_installed INTEGER NOT NULL DEFAULT 0,
+  last_synced_at      TEXT
+);
+
+CREATE TABLE update_pull_requests (               -- template→client update PRs
+  id             INTEGER PRIMARY KEY,
+  client_repo_id INTEGER NOT NULL REFERENCES client_repos(id),
+  kind           TEXT NOT NULL,                   -- template_update|change_request|hotfix
+  source_ref     TEXT,                            -- template release tag
+  title          TEXT, pr_number INTEGER,
+  status         TEXT NOT NULL DEFAULT 'open',    -- open|merged|closed
+  opened_at      TEXT NOT NULL DEFAULT (datetime('now')),
+  merged_at      TEXT
+);
+
+-- ── PROCUREMENT (custom projects, hardware) ────────────────────────────────
+CREATE TABLE purchase_orders (
+  id           INTEGER PRIMARY KEY,
+  project_id   INTEGER NOT NULL REFERENCES projects(id),
+  vendor_id    INTEGER REFERENCES vendors(id),
+  kind         TEXT NOT NULL DEFAULT 'hardware',  -- hardware|services
+  total        REAL NOT NULL DEFAULT 0,
+  status       TEXT NOT NULL DEFAULT 'draft',     -- draft|ordered|received|installed|invoiced
+  ordered_at   TEXT, received_at TEXT
+);
+
+CREATE TABLE purchase_items (
+  id          INTEGER PRIMARY KEY,
+  po_id       INTEGER NOT NULL REFERENCES purchase_orders(id),
+  sku         TEXT, description TEXT,
+  qty         REAL NOT NULL DEFAULT 1,
+  unit_cost   REAL NOT NULL
+);
+
+CREATE TABLE client_devices (                     -- THEIR hardware (≠ our assets)
+  id              INTEGER PRIMARY KEY,
+  project_id      INTEGER NOT NULL REFERENCES projects(id),
+  client_id       INTEGER NOT NULL REFERENCES clients(id),
+  serial_no       TEXT,
+  kind            TEXT NOT NULL DEFAULT 'sensor', -- gateway|sensor|camera
+  firmware_version TEXT, site_location TEXT,      -- "Pump station 2"
+  warranty_until  TEXT,
+  status          TEXT NOT NULL DEFAULT 'ordered' -- ordered|shipped|installed|faulty|rma
+);
+
+-- ── INVESTORS & FUNDING ────────────────────────────────────────────────────
+CREATE TABLE investors (
+  id      INTEGER PRIMARY KEY,
+  name    TEXT NOT NULL,
+  contact TEXT, iban TEXT, notes TEXT
+);
+
+CREATE TABLE project_funding (
+  id              INTEGER PRIMARY KEY,
+  project_id      INTEGER NOT NULL REFERENCES projects(id),
+  target_amount   REAL NOT NULL,
+  status          TEXT NOT NULL DEFAULT 'seeking',
+                  -- seeking|committed|funded|returned|closed
+  terms_summary   TEXT, agreement_url TEXT,
+  created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE investments (
+  id               INTEGER PRIMARY KEY,
+  funding_id       INTEGER NOT NULL REFERENCES project_funding(id),
+  investor_id      INTEGER NOT NULL REFERENCES investors(id),
+  amount           REAL NOT NULL,                -- 10000
+  promised_return  REAL NOT NULL,                -- 15000 (snapshot)
+  return_rule      TEXT NOT NULL DEFAULT 'fixed',-- fixed|multiple|revenue_share
+  invested_at      TEXT NOT NULL DEFAULT (datetime('now')),
+  funds_received_at TEXT
+);
+
+CREATE TABLE investor_payouts (                   -- same guard as team payouts
+  id                 INTEGER PRIMARY KEY,
+  investment_id      INTEGER NOT NULL REFERENCES investments(id),
+  amount             REAL NOT NULL,
+  status             TEXT NOT NULL DEFAULT 'accrued',
+                     -- accrued|blocked|payable|paid
+  trigger_payment_id INTEGER REFERENCES payments(id),  -- client 50k payment
+  payable_at         TEXT, paid_at TEXT, paid_via TEXT
+);
+
+CREATE TABLE funding_waterfalls (                 -- distribution recipe
+  funding_id INTEGER NOT NULL REFERENCES project_funding(id),
+  order_no   INTEGER NOT NULL,
+  target     TEXT NOT NULL,                       -- investors|agency
+  pct        REAL, cap REAL,
+  PRIMARY KEY (funding_id, order_no)
+);
+
+-- ── MODULE ADD-ONS (AI-assisted builds, flat fees) ─────────────────────────
+CREATE TABLE module_orders (
+  id              INTEGER PRIMARY KEY,
+  client_id       INTEGER NOT NULL REFERENCES clients(id),
+  project_id      INTEGER NOT NULL REFERENCES projects(id),
+  ticket_id       INTEGER REFERENCES tickets(id),
+  proposal_id     INTEGER REFERENCES proposals(id),
+  name            TEXT NOT NULL,                  -- "HR Module"
+  scope           TEXT,
+  price           REAL NOT NULL DEFAULT 0,        -- client pays 3000
+  team_member_id  INTEGER REFERENCES team_members(id),
+  team_fee        REAL NOT NULL DEFAULT 0,        -- FLAT 500 (overrides comp_plans)
+  ai_tool         TEXT,                           -- opencode | claude_code
+  status          TEXT NOT NULL DEFAULT 'requested',
+                  -- requested|quoted|accepted|building|in_review|deployed|invoiced|cancelled
+  branch          TEXT,                           -- module/hr
+  pr_number       INTEGER,
+  build_spec      TEXT,                           -- generated prompt (stack+brand+scope)
+  started_at      TEXT, deployed_at TEXT,
+  invoice_id      INTEGER REFERENCES invoices(id)
+);
+
+ALTER TABLE payouts ADD COLUMN module_order_id INTEGER REFERENCES module_orders(id);

@@ -58,6 +58,10 @@ CLIENTS ──► SALES ──► INVOICING & PAYMENTS ──► SUBSCRIPTIONS (
 | 08 | [Assets](docs/08-assets.md) | 5-laptop register, maintenance, depreciation |
 | 09 | [Multi-Branch](docs/09-multi-branch.md) | Carwash 15-branch schema & scoping rules |
 | 10 | [Cost Allocation](docs/10-cost-allocation.md) | Tools, utilities, true per-client margin |
+| 11 | [Code & Client Repos](docs/11-code-client-repos.md) | Repo-per-client, deploy=tag, template update PRs |
+| 12 | [Custom Projects](docs/12-custom-projects-procurement.md) | full_build budgets, hardware POs, client devices |
+| 13 | [Investors & Funding](docs/13-investors-funding.md) | Rounds, restricted cash, waterfall payouts |
+| 14 | [Module Add-ons](docs/14-module-add-ons.md) | AI-assisted builds, build specs, flat team fees |
 
 The consolidated narrative is in **[PROJECT_PLAN.md](PROJECT_PLAN.md)** and the
 full DDL in **[schema/schema.sql](schema/schema.sql)**.

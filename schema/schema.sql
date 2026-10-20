@@ -1030,6 +1030,23 @@ CREATE TABLE bank_reconciliations (
 -- Risk radar = doc 20's six prevention gates rendered as live gauges.
 
 -- ════════════════════════════════════════════════════════════════════
+-- v12 — CRUD lifecycle (doc 27). Two tiny lifecycle columns so that the
+-- archive-not-delete rule is data, not code. Everything else already has
+-- the columns it needs; the CRUD matrix in doc 27 describes the actions.
+-- ════════════════════════════════════════════════════════════════════
+
+-- vendors gain the same archive lifecycle team_members already had, so a
+-- vendor referenced by purchase orders can be retired without deleting the
+-- cost trail (POs keep pointing at an archived row).
+ALTER TABLE vendors
+  ADD COLUMN status TEXT NOT NULL DEFAULT 'active'; -- active|archived
+
+-- team_members' existing status ('active|offboarded') reads as the archive
+-- flag in the UI; no new column, documented here so code and docs agree.
+-- leads already carry every status incl. 'archived' (doc 26 state machine).
+-- clients archive = status column already present (doc 5).
+
+-- ════════════════════════════════════════════════════════════════════
 -- V10 (doc 25) — DATA TABLES, FIELDS & VIEWS
 -- View vocabulary: table · list · board · card · timeline · gallery ·
 -- detail/360 · calendar overlay. Boards = drag flips status (cascades

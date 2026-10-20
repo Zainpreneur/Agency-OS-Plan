@@ -24,6 +24,10 @@ Built to run on the stack recommended in
 6. **Branches are data, not deployments** — multi-branch clients (e.g. a
    carwash with 15 branches) are rows with `(business_id, branch_id)` scoping,
    not separate servers.
+7. **Archive, don't erase** — every entity is fully editable from the UI, but
+   anything another row's history points at **archives instead of deleting**,
+   and the store refuses a hard delete *with the reason*. Creates and
+   transitions are append-only events; money rows void or cancel.
 
 ---
 
@@ -74,10 +78,16 @@ CLIENTS ──► SALES ──► INVOICING & PAYMENTS ──► SUBSCRIPTIONS (
 | 24 | [Analytics & Metrics](docs/24-analytics-dashboard.md) | Six pillars, ~50 metrics, risk radar (gates as gauges), weekly review mode |
 | 25 | [Data Tables, Fields & Views](docs/25-data-tables-views.md) | Full entity→view map: table/list/board/card/timeline/gallery/360 + calendar |
 | 26 | [Stages, Processes & Workflows](docs/26-stages-processes-workflows.md) | Every state machine, transition rules, 4 actors, cascades/guards, 15 end-to-end workflows |
-| 27 | [Forms & Conditional Flows](docs/27-forms-conditional-flows.md) | Form inventory, when-rules engine, Zod tiers, wizard designs, submit side effects |
+| 27 | [Forms & Conditional Flows](docs/27-forms-conditional-flows.md) | Form inventory, when-rules engine, Zod tiers, wizard designs, submit side effects, **full CRUD matrix (v12)** |
 
 The consolidated narrative is in **[PROJECT_PLAN.md](PROJECT_PLAN.md)** and the
-full DDL in **[schema/schema.sql](schema/schema.sql)**.
+full DDL in **[schema/schema.sql](schema/schema.sql)** (current: **v12**).
+
+The **reference frontend** is
+**[Zainpreneur/agency-cockpit](https://github.com/Zainpreneur/agency-cockpit)** —
+the owner cockpit built over this plan (frontend only for now; no backend,
+no database). Every entity there is fully CRUD-able per doc 27's matrix, and
+`src/lib/store.ts` is the single swap point for the future Hono API.
 
 ---
 

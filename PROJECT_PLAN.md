@@ -510,7 +510,25 @@ transaction) · the PO form where doc 20's gates live in the UI
 rendered into an email (Q3 checkbox → Q4 appears; raw answers stored
 verbatim in `intake_responses`) · deploy-target and credential forms
 whose fields branch by provider. Fifteen forms mapped to the workflows
-they advance. Schema v11: one `intake_responses` table.
+they advance. Schema v12: `vendors.status` (archive) joins
+`team_members.status` and `leads.status: archived` so the
+**archive-not-delete** rule is data, not code.
+
+**Full CRUD (doc 27, v12)** — every entity is creatable, editable and
+removable from the UI, carried by three shared pieces: a field-descriptor
+`FormModal` (~25 forms), a `ConfirmModal` that surfaces guard reasons
+inline, and `RowActions` (`✎`/`✕`) on every row/card/tile. Creates and
+status transitions write append-only events; money rows void or cancel,
+never erase; rows referenced by other history archive instead of
+deleting, and the store refuses a hard delete **with the reason**. PO
+advance is the one status chain exposed as a button
+(`draft→ordered→received→installed→invoiced`). Reactivating an archived
+row is just an edit back to `active` — one code path, one audit trail.
+
+The reference frontend lives in **`Zainpreneur/agency-cockpit`**, built
+directly over this plan with no backend yet: `src/lib/store.ts` is the
+single swap point (its actions become HTTP calls when the Hono API
+lands).
 
 ---
 

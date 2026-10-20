@@ -410,6 +410,34 @@ screens, ⌘K, RTL). Schema v8: one `app_settings` key/value table.
 
 ---
 
+## 25. Analytics & metrics — the comprehensive dashboard (doc 24)
+
+Three surfaces: Today = worklist, Dashboard = weekly health, Reports =
+drill-down — all computed from rows the app already records (zero
+manual entry, zero spreadsheets). Six pillars: **Money** (cash
+position vs monthly bank reconciliation, aging buckets, win rate,
+average deal size, per-project margin %, "guard protected {X} this
+month", investor obligations, cost-structure stack, recovery tracker),
+**Pipeline** (stage counts + catalogue-weighted value, first-response
+time, outbox-derived sequence funnel, campaign ROI, time-to-close),
+**Delivery** (throughput, cycle time, review latency, deployment
+health, PO stuck count, change-order rate, first-time-right),
+**People** (team earnings/reliability/transparency velocity, investor
+capital-performance-concentration, vendor on-time/dispute/price
+variance), **Risk radar** (doc 20's six prevention gates as live
+gauges: zero-deposit exposure, default radar, concentration, margin
+floor, agency cash at risk, overdue-everything, credential expiry,
+template debt), **Growth** (template revenue mix, salvage-born
+template proof, upsell conversion, recurring share, LTV proxy,
+industry conversion). Signature features: KPI strip with MoM deltas,
+**15-minute weekly review mode** that ends by pushing decisions into
+Today's queue, and a printable **Numbers page** rendered from the same
+aggregates that fill the investor monthly (I6) and team digest (T9) —
+what you see is exactly what they're told. Schema v9:
+`bank_reconciliations` + threshold keys in `app_settings`.
+
+---
+
 ## Delivery order (MVP → v2)
 
 | Phase | Scope |

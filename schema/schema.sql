@@ -1006,3 +1006,25 @@ CREATE TABLE app_settings (
 -- cascade previews on money actions, guard badges ("waiting on INV-42"),
 -- snapshot badges, StatusChip maps every enum to plain language,
 -- mobile-first for Today/Comms/Money/Clients/Scan, no portals/roles.
+
+-- ════════════════════════════════════════════════════════════════════
+-- V9 (doc 24) — ANALYTICS & METRICS (the comprehensive dashboard)
+-- Six pillars: Money · Pipeline · Delivery · People · Risk · Growth.
+-- Every metric is a SELECT over rows already recorded — zero manual
+-- entry. Aggregates feed the outbound templates (I6 investor monthly,
+-- T9 digest): what you see = what they are told.
+-- ════════════════════════════════════════════════════════════════════
+
+-- Bank truth for the recorded-cash metric (monthly, one row).
+CREATE TABLE bank_reconciliations (
+  id                INTEGER PRIMARY KEY,
+  month             TEXT NOT NULL UNIQUE,        -- 2026-10
+  statement_balance REAL NOT NULL,
+  recorded_balance  REAL NOT NULL,               -- computed from payments/payouts/expenses
+  diff              REAL NOT NULL,
+  note              TEXT
+);
+-- Thresholds tunable via app_settings: margin_floor_pct (25),
+-- concentration_cap_pct (40), overdue_invoice_days (14),
+-- review_latency_days (7), po_stuck_days (5), credential_expiry_days (30).
+-- Risk radar = doc 20's six prevention gates rendered as live gauges.

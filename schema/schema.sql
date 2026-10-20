@@ -895,3 +895,42 @@ ALTER TABLE purchase_orders ADD COLUMN receipt_url TEXT;
 -- team fee before any profit leg.
 -- Message template codes used by the flows: proposal_send, invoice_send,
 -- live_notice, pos_procurement_instruction, payout_digest, investor_monthly.
+
+-- ════════════════════════════════════════════════════════════════════
+-- V5 (doc 20) — LOSS & DEFAULT WATERFALL (the mirror image)
+-- Defaulted project: freeze -> liquidate -> distribute pro-rata to
+-- investor CAPITAL first -> upside cancelled -> agency absorbs the rest.
+-- Realized loss per investor = investments.amount - SUM(recovery_distributions).
+-- ════════════════════════════════════════════════════════════════════
+
+-- projects.status  gains 'defaulted' (then 'written_off' after distribution)
+-- invoices.status  gains 'uncollectible' (never paid; 30k is not revenue)
+-- investor_payouts.status gains 'cancelled' (upside dies with the revenue)
+
+-- Procurement gate: POs funded by investor advance require a recorded
+-- client deposit, or an audited waiver note.
+ALTER TABLE purchase_orders ADD COLUMN deposit_gate_waiver TEXT;
+
+CREATE TABLE asset_dispositions (              -- liquidation of project assets
+  id         INTEGER PRIMARY KEY,
+  project_id INTEGER NOT NULL REFERENCES projects(id),
+  po_id      INTEGER REFERENCES purchase_orders(id),
+  kind       TEXT NOT NULL,                    -- server|license|device
+  disposition TEXT NOT NULL,                   -- returned|resold|repurposed
+  proceeds   REAL NOT NULL,                    -- cash actually recovered
+  fee        REAL NOT NULL DEFAULT 0,          -- restocking/shipping
+  counterparty TEXT,
+  at         TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE recovery_distributions (          -- who gets salvaged cash, in order
+  id            INTEGER PRIMARY KEY,
+  investment_id INTEGER NOT NULL REFERENCES investments(id),
+  source        TEXT NOT NULL,                 -- unspent_pot|liquidation|agency_goodwill
+  amount        REAL NOT NULL,                 -- pro-rata to capital in
+  at            TEXT NOT NULL DEFAULT (datetime('now'))
+);
+-- Prevention gates (doc 20): deposit-before-procure, milestone buying,
+-- concentration cap, margin sanity, guaranteed-return-is-debt (a fixed
+-- return NOT tied to client payment is recorded as a LOAN, never as
+-- investments), client-vanish nag list while assets are still returnable.

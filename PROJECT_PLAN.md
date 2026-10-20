@@ -315,6 +315,28 @@ rehearsed failure modes are listed in the doc.
 
 ---
 
+## 21. Loss & default waterfall — the mirror image (doc 20)
+
+The 30k-deal/20k-cost/2-investors/client-vanishes scenario, reasoned
+through: the blocked→payable guards mean the 10k team fee and the 26k
+investor returns **never unlock** without the client payment — actual
+cash at risk is the 10k of servers, against a still-segregated 10k pot.
+Default protocol: freeze (`defaulted`, `uncollectible`, upside rows
+`cancelled`) → liquidate (unspent pot + `asset_dispositions`: return /
+resell / repurpose servers; code becomes internal IP) → **recovery
+waterfall mirroring the profit tiers** — investor *capital* pro-rata
+first, optional team goodwill from agency pocket or strictly after
+investors, agency absorbs the remainder → realized loss computed per
+investor (`amount − Σ recovery_distributions`), never negotiated from
+memory. The refund challenge is answered by the funding-time contract
+snapshot and the trigger design: guaranteed returns would be a *loan*,
+enforced at data entry. Six prevention gates close the loop:
+deposit-before-procure (audited waiver column), milestone buying,
+concentration caps, margin sanity, guaranteed-return-is-debt, and a
+client-vanish nag list while assets are still returnable.
+
+---
+
 ## Delivery order (MVP → v2)
 
 | Phase | Scope |

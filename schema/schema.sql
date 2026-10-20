@@ -877,3 +877,21 @@ ALTER TABLE proposals ADD COLUMN acceptance_channel TEXT;        -- whatsapp|ema
 ALTER TABLE proposals ADD COLUMN acceptance_note TEXT;           -- pasted reply snippet
 -- Daily queue is a computed view, not a table: follow-ups due +
 -- invoices ready + unpaid > 7 days + payout digests due today.
+
+-- ════════════════════════════════════════════════════════════════════
+-- V4b (doc 19) — PROCUREMENT PO gaps found by the POS walkthrough
+-- ════════════════════════════════════════════════════════════════════
+
+-- Which pot pays: investor-advance (restricted, doc 13) vs own cash.
+ALTER TABLE purchase_orders ADD COLUMN funding_id INTEGER REFERENCES project_funding(id);
+-- Who executes the purchase (owner or an assigned team member).
+ALTER TABLE purchase_orders ADD COLUMN assigned_team_member_id INTEGER REFERENCES team_members(id);
+-- Proof of purchase (receipt photo/file) — gate for marking received.
+ALTER TABLE purchase_orders ADD COLUMN receipt_url TEXT;
+
+-- Investor seniority pattern (doc 19): book principal and upside as
+-- SEPARATE investor_payouts rows on the same investment — tiers 1/3 in
+-- the walkthrough — so a partial client payment clears principal +
+-- team fee before any profit leg.
+-- Message template codes used by the flows: proposal_send, invoice_send,
+-- live_notice, pos_procurement_instruction, payout_digest, investor_monthly.

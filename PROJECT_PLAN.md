@@ -296,6 +296,25 @@ beyond that, switch views on.
 
 ---
 
+## 20. Worked example: the POS + hardware deal (doc 19)
+
+The acceptance test tying docs 12–14+18 together, traced row-by-row:
+WhatsApp request → `comms_log` → draft `purchase_orders`/`purchase_items`
+(vendor × price per item) → investor funds procurement via
+`project_funding`/`investments` (2,000, fixed 3,000 return) → PO bound to
+the restricted pot and an assigned team member → 10,000 proposal sent as
+a WhatsApp message, acceptance recorded as the client's reply →
+procurement-instruction message to the team member → receipts flip the
+PO to received → invoice at snapshot price → payment fires the guards:
+**two** `investor_payouts` rows (principal first, upside *after* the
+team fee) + the flat-fee `payouts` row. Result: investor 3,000, team
+2,000, agency 5,000, agency cash outlay 0. Schema gap fixed by the
+walkthrough: POs gained `funding_id`, `assigned_team_member_id`,
+`receipt_url`. Partial-payment behavior is tiered, not pro-rata —
+rehearsed failure modes are listed in the doc.
+
+---
+
 ## Delivery order (MVP → v2)
 
 | Phase | Scope |

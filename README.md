@@ -66,6 +66,7 @@ CLIENTS ──► SALES ──► INVOICING & PAYMENTS ──► SUBSCRIPTIONS (
 | 16 | [Deployment Matrix](docs/16-deployment-matrix.md) | Vercel / Hostinger / PaaS / office VPS pull-agent, one pipeline |
 | 17 | [Service Schema Reuse](docs/17-service-schema-reuse.md) | Attributes/variants/values engine for quoting; forbidden in ledgers |
 | 18 | [Solo Mode](docs/18-solo-mode.md) | Owner-only operation; WhatsApp/email message pipeline; portals deferred |
+| 19 | [POS Scenario Walkthrough](docs/19-pos-scenario-walkthrough.md) | Worked example: WhatsApp deal → POs → investor advance → tiers → margin |
 
 The consolidated narrative is in **[PROJECT_PLAN.md](PROJECT_PLAN.md)** and the
 full DDL in **[schema/schema.sql](schema/schema.sql)**.

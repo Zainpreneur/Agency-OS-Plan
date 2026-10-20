@@ -62,6 +62,9 @@ CLIENTS ──► SALES ──► INVOICING & PAYMENTS ──► SUBSCRIPTIONS (
 | 12 | [Custom Projects](docs/12-custom-projects-procurement.md) | full_build budgets, hardware POs, client devices |
 | 13 | [Investors & Funding](docs/13-investors-funding.md) | Rounds, restricted cash, waterfall payouts |
 | 14 | [Module Add-ons](docs/14-module-add-ons.md) | AI-assisted builds, build specs, flat team fees |
+| 15 | [Integrations & Credentials](docs/15-integrations-credentials.md) | Client-owned accounts, AES-256-GCM vault, three money lanes |
+| 16 | [Deployment Matrix](docs/16-deployment-matrix.md) | Vercel / Hostinger / PaaS / office VPS pull-agent, one pipeline |
+| 17 | [Service Schema Reuse](docs/17-service-schema-reuse.md) | Attributes/variants/values engine for quoting; forbidden in ledgers |
 
 The consolidated narrative is in **[PROJECT_PLAN.md](PROJECT_PLAN.md)** and the
 full DDL in **[schema/schema.sql](schema/schema.sql)**.

@@ -216,6 +216,68 @@ before you build for others*.
 
 ---
 
+## 16. Integrations & Credential Vault (doc 15)
+
+**"Client owns the world, you hold the keys."** Every account, subscription,
+and card is created under the *client's* identity (provisioned via *their*
+Google OAuth); the agency's cards never touch a client project. What the
+agency holds is encrypted (AES-256-GCM vault, key from env, every secret
+READ audited), scoped, and revocable. A connector layer (Airtable → tables,
+Formaloo → forms, WhatsApp Cloud API → messaging) hides all of this behind
+plain language, with health-checks that auto-ticket a broken token before
+the client notices.
+
+Three money lanes: **(A)** client → agency (dev fee on deployment
+acceptance, hardware pass-through at PO price), **(B)** client → providers
+directly on their own card — *tracked* in `external_client_costs`, never
+billed and never mixed into margin reports, **(C)** client → agency for the
+agency's own SaaS (subscriptions engine). Card numbers are never stored
+(PCI). Code repos default to agency-held with a `repo_policy` that flips on
+final payment — data and accounts are unconditionally the client's.
+Offboarding is a revoke-all checklist because everything vault-references
+its credentials.
+
+---
+
+## 17. Deployment Matrix (doc 16)
+
+One pipeline, four adapters: **Vercel** (API token), **Hostinger VPS**
+(SSH + build script), **generic PaaS** (deploy hook), **office VPS**
+(**pull-agent** — their box polls for releases, no inbound firewall holes;
+`pending_agent` status when offline). Uniform contract:
+`deploy(sha) / rollback() / healthcheck() / logs()`; merge → deploy →
+health check → `current_sha` updated → portal flips to *"Your app is live ✓"*
+in non-technical language. Every provider gets a one-button rollback.
+Payment gate: all production targets healthy + explicit client acceptance
+click → invoice(s) at snapshot price → payment webhook → maintenance mode.
+
+---
+
+## 18. Reusing zainpreneur-app's Service Schema (doc 17)
+
+`zainpreneur-app` already ships a complete configuration-pricing engine
+(AttributeRecord → AttributeValue with `priceExtra` → Variant with
+price/cost/margin → Quote breakdown → RequestSnapshot freeze, already used
+by its LeadProposal). Agency OS reuses it instead of reinventing it, under
+one rule:
+
+> If the client chooses it and it changes the price → attribute/value.
+> If it's an event or money movement → a plain typed column. Never the reverse.
+
+**Required** in: proposal/quoting (price computes itself line by line —
+the "client sees *why* 3,000" requirement), module add-on quoting (config
+selections render the build spec), the client portal intake (the existing
+`ServiceRequestWizard` with pill/color pickers = zero jargon), delivery
+(ServiceRequest's branch scope, effort tracking, snapshot — already built
+and tested). **Helpful** in: template catalogues (variants carry cost and
+margin *before* quoting) and demo configuration. **Forbidden** in every
+ledger: payouts, expenses, payments, investments, assets, credentials,
+campaign targets — immutable rows only. A reused quote configuration can
+crystallize into a named variant (`generation: 'dynamically'`) — quoted
+configs become catalogue products.
+
+---
+
 ## Delivery order (MVP → v2)
 
 | Phase | Scope |

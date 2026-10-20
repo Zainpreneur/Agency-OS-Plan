@@ -731,3 +731,114 @@ CREATE TABLE module_orders (
 );
 
 ALTER TABLE payouts ADD COLUMN module_order_id INTEGER REFERENCES module_orders(id);
+
+-- ════════════════════════════════════════════════════════════════════
+-- V3 (docs 15, 16, 17) — INTEGRATIONS & CREDENTIALS
+-- Philosophy: client owns accounts & cards; agency holds encrypted,
+-- scoped, revocable access only. Card numbers are NEVER stored (PCI).
+-- ════════════════════════════════════════════════════════════════════
+
+-- Only place secrets live. AES-256-GCM ciphertext; key comes from env.
+CREATE TABLE credentials (
+  id             INTEGER PRIMARY KEY,
+  client_id      INTEGER NOT NULL REFERENCES clients(id),
+  project_id     INTEGER REFERENCES projects(id),
+  provider       TEXT NOT NULL,     -- google|airtable|formaloo|meta|vercel|tap|moyasar|ssh|other
+  kind           TEXT NOT NULL,     -- oauth_token|api_key|ssh_key|service_account
+  ciphertext     TEXT NOT NULL,     -- AES-256-GCM
+  iv             TEXT NOT NULL,
+  auth_tag       TEXT NOT NULL,
+  scopes         TEXT,              -- least-privilege scope string
+  expires_at     TEXT,
+  last_rotated   TEXT,
+  status         TEXT NOT NULL DEFAULT 'active',  -- active|revoked
+  last_used_at   TEXT
+);
+
+-- Every secret READ is logged (actor, action, entity, entity_id, at).
+CREATE TABLE audit_log (
+  id        INTEGER PRIMARY KEY,
+  actor     TEXT NOT NULL,         -- team member or system job
+  action    TEXT NOT NULL,         -- read|create|rotate|revoke|use
+  entity    TEXT NOT NULL,         -- credential|repo|target|invoice|...
+  entity_id INTEGER,
+  at        TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- The connector layer the client never sees the internals of.
+CREATE TABLE connector_catalog (
+  provider        TEXT PRIMARY KEY,  -- airtable|formaloo|whatsapp|google|hostinger|...
+  category        TEXT NOT NULL,     -- tables|forms|messaging|auth|hosting
+  auth_type       TEXT NOT NULL,     -- oauth|api_key|ssh
+  pricing_model   TEXT,              -- free|per_seat|usage — for advisory cards
+  owned_by        TEXT NOT NULL DEFAULT 'client',  -- client|agency — never mix in margin reports
+  selection_notes TEXT               -- plain-language "when to pick this"
+);
+
+CREATE TABLE project_connectors (
+  id                  INTEGER PRIMARY KEY,
+  client_id           INTEGER NOT NULL REFERENCES clients(id),
+  project_id          INTEGER REFERENCES projects(id),
+  credential_id       INTEGER REFERENCES credentials(id),
+  status              TEXT NOT NULL DEFAULT 'requested', -- requested|provisioned|connected|broken
+  provisioned_at      TEXT,
+  external_ref        TEXT,           -- provider-side record id (never secrets)
+  last_healthcheck_at TEXT            -- cron: token valid? quota ok? broken -> auto-ticket
+);
+
+-- LANE B — client's own recurring third-party costs: TRACKED, NEVER BILLED.
+CREATE TABLE external_client_costs (
+  id                     INTEGER PRIMARY KEY,
+  client_id              INTEGER NOT NULL REFERENCES clients(id),
+  project_id             INTEGER REFERENCES projects(id),
+  provider               TEXT NOT NULL,
+  plan                   TEXT,
+  amount                 INTEGER NOT NULL,  -- minor units, advisory only
+  currency               TEXT NOT NULL DEFAULT 'USD',
+  billing_day            INTEGER,
+  status                 TEXT NOT NULL DEFAULT 'active',  -- active|downgraded|cancelled
+  renewal_notice_sent_at TEXT             -- cron reminds CLIENT, not your card
+);
+
+-- repo_policy: agency code is yours until paid; data/accounts always theirs.
+ALTER TABLE client_repos ADD COLUMN repo_policy TEXT DEFAULT 'agency_held'; -- agency_held|shared|transferred
+
+-- ════════════════════════════════════════════════════════════════════
+-- V3 — DEPLOYMENT TARGETS (doc 16) — four adapters, one pipeline
+-- ════════════════════════════════════════════════════════════════════
+
+CREATE TABLE deployment_targets (
+  id             INTEGER PRIMARY KEY,
+  client_repo_id INTEGER NOT NULL REFERENCES client_repos(id),
+  env            TEXT NOT NULL,      -- staging|production
+  provider       TEXT NOT NULL,      -- vercel|hostinger_vps|generic_paas|office_vps
+  domain         TEXT,
+  credential_id  INTEGER REFERENCES credentials(id),  -- API token / SSH key from vault
+  env_vars_json  TEXT,               -- NAMES only; values live in vault
+  deploy_method  TEXT NOT NULL,      -- api|ssh_script|agent_poll
+  status         TEXT NOT NULL DEFAULT 'never_deployed', -- never_deployed|healthy|degraded|pending_agent
+  last_deploy_at TEXT,
+  current_sha    TEXT,
+  health_url     TEXT
+);
+-- Adapter contract: deploy(sha) / rollback() / healthcheck() / logs().
+-- office_vps = pull-agent model (no inbound firewall holes).
+-- Payment gate: all production targets healthy + client acceptance click
+--   -> invoice (snapshot price) + hardware POs -> payment webhook -> maintenance.
+
+-- ════════════════════════════════════════════════════════════════════
+-- V3 — SERVICE-SCHEMA REUSE (doc 17)
+-- The attribute/variant/quote engine lives in zainpreneur-app's catalogue
+-- (AttributeRecord / AttributeValue / Variant / Quote / RequestSnapshot /
+-- LeadProposal). Only the integration rule for THIS plan's tables:
+--
+--   client-chosen AND price-affecting -> attribute/value
+--   event or money movement            -> plain typed column
+--   NEVER the reverse.
+--
+-- proposal_lines are GENERATED by the Quote engine (basePrice +
+-- variantExtra + attributeExtras + configurationCharges +
+-- additionalServices - discount) and frozen into proposals.snapshot at
+-- acceptance; estimatedCost stays off the client PDF.
+-- Ledger tables above stay attribute-free by design.
+-- ════════════════════════════════════════════════════════════════════

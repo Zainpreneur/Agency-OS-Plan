@@ -337,6 +337,28 @@ client-vanish nag list while assets are still returnable.
 
 ---
 
+## 22. The salvage play — dead deal into next deal (doc 21)
+
+The defaulted hotel deal left three surviving assets — 50 contacts, the
+built code, the servers — and the platform converts each: the contacts
+become a hotel-vertical campaign (30 pitched, 1 accepted at 60,000, 3.3%
+on a warm list), the code is born as an **internal template** quoted via
+the Quote engine, and the servers are **repurposed at 9,000 book value**
+into the new project (`asset_dispositions`), settling the dead
+project's recovery pot (4.5k per investor, closing the old 500 loss as
+documented history). The new funding round is tagged `salvage_round`
+and offered first to the burned investors with **enhanced, still
+trigger-bound** terms (15k back on 10k in — the extra value, justified
+by the de-risked IP). The team's cancelled old fee is honored by
+riding the new deal as flat `delivery` 10k + `bonus` 2k rows — the
+blocked→payable guard is never broken. The 60k waterfall: recovery 9k →
+team 12k → investor principal 20k → enhanced upside 10k → agency margin
+**9k**, plus the template IP and 49 warmed leads. Whole seam costs
+schema v6: two columns on `project_funding` and one
+`recovery_distributions` source code.
+
+---
+
 ## Delivery order (MVP → v2)
 
 | Phase | Scope |

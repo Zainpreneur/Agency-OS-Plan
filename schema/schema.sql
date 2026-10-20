@@ -675,6 +675,8 @@ CREATE TABLE project_funding (
   target_amount   REAL NOT NULL,
   status          TEXT NOT NULL DEFAULT 'seeking',
                   -- seeking|committed|funded|returned|closed
+  source_kind     TEXT NOT NULL DEFAULT 'fresh', -- fresh|salvage_round
+  salvage_of_project_id INTEGER,            -- round that salvages a defaulted project
   terms_summary   TEXT, agreement_url TEXT,
   created_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -926,7 +928,7 @@ CREATE TABLE asset_dispositions (              -- liquidation of project assets
 CREATE TABLE recovery_distributions (          -- who gets salvaged cash, in order
   id            INTEGER PRIMARY KEY,
   investment_id INTEGER NOT NULL REFERENCES investments(id),
-  source        TEXT NOT NULL,                 -- unspent_pot|liquidation|agency_goodwill
+  source        TEXT NOT NULL,                 -- unspent_pot|liquidation|repurposed_sale|agency_goodwill
   amount        REAL NOT NULL,                 -- pro-rata to capital in
   at            TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -934,3 +936,19 @@ CREATE TABLE recovery_distributions (          -- who gets salvaged cash, in ord
 -- concentration cap, margin sanity, guaranteed-return-is-debt (a fixed
 -- return NOT tied to client payment is recorded as a LOAN, never as
 -- investments), client-vanish nag list while assets are still returnable.
+
+-- ════════════════════════════════════════════════════════════════════
+-- V6 (doc 21) — THE SALVAGE PLAY (dead deal -> next deal -> everyone whole)
+-- Schema cost of the whole seam: the two columns above
+-- (project_funding.source_kind/salvage_of_project_id) and the
+-- repurposed_sale source code. Everything else reuses existing rows:
+--   - dead deal's code -> templates row (internal template is born)
+--   - servers -> asset_dispositions (repurposed at book value)
+--   - new funding round tagged salvage_round, offered first to the
+--     prior investors with enhanced (still trigger-bound) terms
+--   - team: cancelled old fee honored as flat delivery + bonus rows on
+--     the new deal — the guard is never broken, the work rides a deal
+--     that has cash
+-- Net example: 60k waterfall -> recovery 9k, team 12k, investors 30k,
+-- agency margin 9k + template IP + 49 warmed leads.
+-- ════════════════════════════════════════════════════════════════════

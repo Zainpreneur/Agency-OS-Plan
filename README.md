@@ -72,6 +72,7 @@ CLIENTS ──► SALES ──► INVOICING & PAYMENTS ──► SUBSCRIPTIONS (
 | 22 | [Email-First Communications](docs/22-email-first-communications.md) | ~45 templates × 6 stakeholders, stages, reply-flips, sequence chains (WhatsApp deferred) |
 | 23 | [UI/UX Plan](docs/23-ui-ux-plan.md) | Owner cockpit: Today queue hero, cascade previews, guard badges, visual system, build order |
 | 24 | [Analytics & Metrics](docs/24-analytics-dashboard.md) | Six pillars, ~50 metrics, risk radar (gates as gauges), weekly review mode |
+| 25 | [Data Tables, Fields & Views](docs/25-data-tables-views.md) | Full entity→view map: table/list/board/card/timeline/gallery/360 + calendar |
 
 The consolidated narrative is in **[PROJECT_PLAN.md](PROJECT_PLAN.md)** and the
 full DDL in **[schema/schema.sql](schema/schema.sql)**.

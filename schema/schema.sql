@@ -1028,3 +1028,30 @@ CREATE TABLE bank_reconciliations (
 -- concentration_cap_pct (40), overdue_invoice_days (14),
 -- review_latency_days (7), po_stuck_days (5), credential_expiry_days (30).
 -- Risk radar = doc 20's six prevention gates rendered as live gauges.
+
+-- ════════════════════════════════════════════════════════════════════
+-- V10 (doc 25) — DATA TABLES, FIELDS & VIEWS
+-- View vocabulary: table · list · board · card · timeline · gallery ·
+-- detail/360 · calendar overlay. Boards = drag flips status (cascades
+-- fire on drop; payouts are guard-decided, not drag-decided).
+-- ════════════════════════════════════════════════════════════════════
+
+-- Written by the SAME code path that flips any status column, so
+-- timelines can never drift from reality. Timeline = event union per
+-- entity (leads also use lead_activities; credentials use audit_log).
+CREATE TABLE status_events (
+  id          INTEGER PRIMARY KEY,
+  entity      TEXT NOT NULL,        -- lead|project|invoice|module_order|payout|po|proposal
+  entity_id   INTEGER NOT NULL,
+  from_status TEXT,
+  to_status   TEXT NOT NULL,
+  note        TEXT,
+  at          TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Gallery image fields (fallback = colored initials card, never broken).
+ALTER TABLE templates ADD COLUMN image_url TEXT;
+ALTER TABLE assets ADD COLUMN image_url TEXT;
+ALTER TABLE client_devices ADD COLUMN image_url TEXT;
+-- Calendar overlay = the existing due_at family (follow-ups, valid_until,
+-- invoice due, demo expiry, renewals, credential expiry) — no new table.

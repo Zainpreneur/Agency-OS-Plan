@@ -438,6 +438,29 @@ what you see is exactly what they're told. Schema v9:
 
 ---
 
+## 26. Data tables, fields & views — the full map (doc 25)
+
+The DDL-to-UI contract: a view vocabulary (**table** for dense money
+records, **list** for one-status-one-action rows, **board** for
+pipelines where drag flips status and cascades fire on drop, **card**
+for decision objects, **timeline** for event unions, **gallery** for
+visual objects, **detail/360** as the destination, plus a **calendar
+overlay** over the existing due_at family — no new events table for
+dates). Entity-by-entity field maps for all ~35 entities across Sales
+(leads board + activity timeline, demos gallery, proposals board),
+Delivery (project 360s, module-order boards, stuck-first PO tables with
+funded-by badges, deploy-target cards with rollback), Money (overdue-
+first invoice tables with aging sort, payouts boards where **payouts
+are guard-decided, not drag-decided**), People, Catalogue (templates
+gallery + pill editors) and Infra (masked credentials, receipt
+galleries). Schema v10 fixes the one real gap: **`status_events`**,
+written by the same code path that flips any status column, completing
+timeline views for six entities (leads already had `lead_activities`,
+credentials use `audit_log`); plus `image_url` on templates, assets,
+and client devices for galleries with initials-card fallbacks.
+
+---
+
 ## Delivery order (MVP → v2)
 
 | Phase | Scope |

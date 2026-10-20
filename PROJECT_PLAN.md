@@ -461,6 +461,33 @@ and client devices for galleries with initials-card fallbacks.
 
 ---
 
+## 27. Stages, processes & workflows — the complete state machines (doc 26)
+
+The process spine tying every doc together. **Universal rules**: one
+`flip()` write path (column + `status_events` row, atomic) · four
+actors (owner, payment webhooks, GitHub webhooks, cron) · cascades are
+transition side effects, never manual second steps (invoice paid →
+payouts unblock; healthy deploy + acceptance → invoice sent; reply →
+queue cancelled) · guards outrank gestures (payouts can't be dragged to
+payable) · prices never move with status · nothing hard-deleted.
+**State machine catalog** for all ~25 entities across Sales (lead
+9-stage pipeline, campaigns, demos, proposals), Delivery (projects
+incl. defaulted, module orders, POs with receipt-required, devices,
+deploy targets), Money (invoices with the central paid-transition,
+team + investor payout guards, funding rounds, subscriptions) and
+People/infra (connectors, credentials, outbox). **Fifteen end-to-end
+workflows**: cold lead → cash (the spine), upsell, module add-on,
+custom project with procurement + investor funding, SaaS subscription,
+investor round, default & loss, salvage play, vendor loop, template
+maintenance, credential lifecycle, daily loop, weekly review,
+offboarding, deployment & rollback — each with guards and side
+effects. Terminal-state semantics table (lost vs cancelled vs
+defaulted vs void vs uncollectible vs revoked) with reversibility
+rules. No schema change: v10 stands; the only new artifact is the
+`flip()` path and its cascade/guard registry.
+
+---
+
 ## Delivery order (MVP → v2)
 
 | Phase | Scope |

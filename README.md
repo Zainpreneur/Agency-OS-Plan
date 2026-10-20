@@ -65,6 +65,7 @@ CLIENTS ──► SALES ──► INVOICING & PAYMENTS ──► SUBSCRIPTIONS (
 | 15 | [Integrations & Credentials](docs/15-integrations-credentials.md) | Client-owned accounts, AES-256-GCM vault, three money lanes |
 | 16 | [Deployment Matrix](docs/16-deployment-matrix.md) | Vercel / Hostinger / PaaS / office VPS pull-agent, one pipeline |
 | 17 | [Service Schema Reuse](docs/17-service-schema-reuse.md) | Attributes/variants/values engine for quoting; forbidden in ledgers |
+| 18 | [Solo Mode](docs/18-solo-mode.md) | Owner-only operation; WhatsApp/email message pipeline; portals deferred |
 
 The consolidated narrative is in **[PROJECT_PLAN.md](PROJECT_PLAN.md)** and the
 full DDL in **[schema/schema.sql](schema/schema.sql)**.

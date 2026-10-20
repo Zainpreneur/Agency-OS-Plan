@@ -278,6 +278,24 @@ configs become catalogue products.
 
 ---
 
+## 19. Solo Mode — owner-only operation (doc 18)
+
+The owner is the app's only user; no client portal, no investor
+dashboard, no team login. The app *creates artifacts and generates
+messages* (template → merge fields → one-click WhatsApp `wa.me` link /
+`mailto` → logged in `comms_log`); the human sends them and pastes
+replies back, flipping status columns. Payment: webhook if configured,
+otherwise **Mark paid** (`payment_confirmation = webhook|manual`).
+Deployment acceptance and investor notification become recorded replies,
+not portal clicks. A computed **daily queue** (follow-ups due, invoices
+ready, unpaid > 7 days, digests) replaces automation — the main failure
+mode at this scale is forgetting, not tooling. Portals were always just
+read-views over these tables: solo mode doesn't build them, and adding
+them later needs no data migration. Ceiling ≈ 30–50 active clients;
+beyond that, switch views on.
+
+---
+
 ## Delivery order (MVP → v2)
 
 | Phase | Scope |

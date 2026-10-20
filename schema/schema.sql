@@ -842,3 +842,38 @@ CREATE TABLE deployment_targets (
 -- acceptance; estimatedCost stays off the client PDF.
 -- Ledger tables above stay attribute-free by design.
 -- ════════════════════════════════════════════════════════════════════
+
+-- ════════════════════════════════════════════════════════════════════
+-- V4 (doc 18) — SOLO MODE: owner is the only app user
+-- Portals are never built; every stakeholder touchpoint is a generated
+-- message (WhatsApp/email) + a status column the owner flips.
+-- Portals, if ever wanted, are pure read-views over these same tables.
+-- ════════════════════════════════════════════════════════════════════
+
+CREATE TABLE message_templates (
+  code           TEXT PRIMARY KEY,   -- invoice_send, proposal_send, live_notice, payout_digest, investor_monthly
+  channel        TEXT NOT NULL,      -- whatsapp|email
+  title          TEXT NOT NULL,
+  body           TEXT NOT NULL,      -- merge fields: {client} {amount} {link} {due} ...
+  variables_json TEXT,               -- declared variables for render-time checks
+  active         TEXT NOT NULL DEFAULT 'yes'
+);
+
+-- The OS remembers what was said, out-of-band, per stakeholder.
+CREATE TABLE comms_log (
+  id                INTEGER PRIMARY KEY,
+  contactable_type  TEXT NOT NULL,   -- lead|client|investor|team|vendor
+  contactable_id    INTEGER NOT NULL,
+  channel           TEXT NOT NULL,   -- whatsapp|email|call
+  direction         TEXT NOT NULL,   -- out|in
+  template_code     TEXT REFERENCES message_templates(code),
+  snippet           TEXT NOT NULL,   -- rendered message or pasted reply (verbatim)
+  at                TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Solo-mode payment/acceptance recording (human confirms out-of-band).
+ALTER TABLE invoices ADD COLUMN payment_confirmation TEXT;        -- webhook|manual
+ALTER TABLE proposals ADD COLUMN acceptance_channel TEXT;        -- whatsapp|email|verbal
+ALTER TABLE proposals ADD COLUMN acceptance_note TEXT;           -- pasted reply snippet
+-- Daily queue is a computed view, not a table: follow-ups due +
+-- invoices ready + unpaid > 7 days + payout digests due today.

@@ -488,6 +488,32 @@ rules. No schema change: v10 stands; the only new artifact is the
 
 ---
 
+## 28. Forms, conditional logic & flows (doc 27)
+
+Every form in the app with fields, conditions, and submit side
+effects. **Architecture**: shared field vocabulary (money inputs are
+currency-aware minor-units, relationship pickers always offer inline
+create, photo uploads for receipts/serials) · **Zod schemas shared
+between form and server** (four validation tiers: field, cross-field,
+business rules re-enforced server-side, cascade-preview confirms for
+irreversible actions) · typed data never lost · offline draft autosave
+· one-transaction multi-step submits. **Conditional engine**: declarative
+`when`-rules co-located with each schema (`show`/`require`/
+`require_unless`/`default_if`/`options_from`), cleanly separated from
+catalogue exclusions (data-driven, doc 17). **Flagship forms**: the
+5-step proposal builder (variant pills filter attributes live,
+exclusions grey out impossible combos with reasons, discount>0 demands
+a reason, margin visible only to the owner, snapshot & send in one
+transaction) · the PO form where doc 20's gates live in the UI
+(investor-advance funding ⇒ deposit check ⇒ waiver note **required**)
+· Mark paid with its cascade preview panel · the intake questionnaire
+rendered into an email (Q3 checkbox → Q4 appears; raw answers stored
+verbatim in `intake_responses`) · deploy-target and credential forms
+whose fields branch by provider. Fifteen forms mapped to the workflows
+they advance. Schema v11: one `intake_responses` table.
+
+---
+
 ## Delivery order (MVP → v2)
 
 | Phase | Scope |

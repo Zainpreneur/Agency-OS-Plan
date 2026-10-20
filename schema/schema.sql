@@ -1055,3 +1055,24 @@ ALTER TABLE assets ADD COLUMN image_url TEXT;
 ALTER TABLE client_devices ADD COLUMN image_url TEXT;
 -- Calendar overlay = the existing due_at family (follow-ups, valid_until,
 -- invoice due, demo expiry, renewals, credential expiry) — no new table.
+
+-- ════════════════════════════════════════════════════════════════════
+-- V11 (doc 27) — FORMS, CONDITIONAL LOGIC & FLOWS
+-- Forms are code (React + shared Zod schemas); conditions are
+-- declarative when-rules co-located with each schema:
+--   { field, is, show | require | require_unless | default_if | options_from }
+-- Two condition systems, separated: catalogue EXCLUSIONS (attribute
+-- combos, data-driven, doc 17) vs app-form conditions (code, tested).
+-- Irreversible submits show cascade previews; typed data is never
+-- lost; drafts autosave locally (offline lib).
+-- ════════════════════════════════════════════════════════════════════
+
+-- Raw questionnaire answers (C2 email form) kept verbatim, auditable,
+-- next to the project scope fields they populate.
+CREATE TABLE intake_responses (
+  id          INTEGER PRIMARY KEY,
+  client_id   INTEGER NOT NULL REFERENCES clients(id),
+  project_id  INTEGER REFERENCES projects(id),
+  answers_json TEXT NOT NULL,        -- verbatim, never edited
+  received_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
